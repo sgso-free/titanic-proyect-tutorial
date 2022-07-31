@@ -4,7 +4,8 @@ import pickle
 
 from sklearn.model_selection import train_test_split   
 from sklearn.preprocessing import MinMaxScaler 
-from sklearn.ensemble import RandomForestClassifier  
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import GradientBoostingClassifier  
 
 #Import data from csv
 train_data = pd.read_csv('https://raw.githubusercontent.com/4GeeksAcademy/random-forest-project-tutorial/main/titanic_train.csv', sep=",")
@@ -44,6 +45,8 @@ y = train_data[['Survived']]
 #Split the data
 X_train, X_test, y_train, y_test = train_test_split(X, y, stratify=y,random_state=34)
 
+#***************** MODEL RANDOMFOREST*******************
+
 params = {'criterion': 'entropy',
     'max_depth': 10,
     'max_features': 6,
@@ -62,3 +65,20 @@ modelo.fit(X_train, y_train.values.ravel())
 filename = 'models/finalized_model.sav' #use absolute path
 pickle.dump(modelo, open(filename, 'wb'))
  
+#***************** MODEL BOOSTING*******************
+
+param_best_GBC =  {'criterion': 'friedman_mse',
+            'learning_rate': 0.15,
+            'max_depth': 5,
+            'max_features': 'sqrt',
+            'min_samples_leaf': 0.1,
+            'min_samples_split': 0.1,
+            'n_estimators': 50}
+
+clf_GBBest = GradientBoostingClassifier(random_state=34,**param_best_GBC) 
+
+clf_GBBest.fit(X_train, y_train.values.ravel()) 
+
+#save the model to file
+filename = 'models/boosting_model.sav' #use absolute path
+pickle.dump(modelo, open(filename, 'wb'))
