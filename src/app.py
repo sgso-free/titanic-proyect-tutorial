@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd 
 import pickle
+import xgboost as xgb
 
 from sklearn.model_selection import train_test_split   
 from sklearn.preprocessing import MinMaxScaler 
@@ -61,11 +62,13 @@ modelo = RandomForestClassifier(
 
 modelo.fit(X_train, y_train.values.ravel())
 
+print('Accuracy RandomForest:',modelo.score(X_test, y_test)) 
+
 #save the model to file
 filename = 'models/finalized_model.sav' #use absolute path
 pickle.dump(modelo, open(filename, 'wb'))
  
-#***************** MODEL BOOSTING*******************
+#***************** MODEL GRADIENT BOOSTING - sklearn*******************
 
 param_best_GBC =  {'criterion': 'friedman_mse',
             'learning_rate': 0.15,
@@ -79,6 +82,45 @@ clf_GBBest = GradientBoostingClassifier(random_state=34,**param_best_GBC)
 
 clf_GBBest.fit(X_train, y_train.values.ravel()) 
 
+print('Accuracy GB:',clf_GBBest.score(X_test, y_test)) 
+
 #save the model to file
 filename = 'models/boosting_model.sav' #use absolute path
+pickle.dump(modelo, open(filename, 'wb'))
+
+#***************** MODEL BOOSTING - XGB*******************
+
+ 
+XB_train = X_train.copy()
+XB_test = X_test.copy()
+yB_train = y_train.copy()
+yB_test = y_test.copy()
+
+
+XB_train['Sex'] = X_train['Sex'].astype(int)
+XB_train['Embarked'] = X_train['Embarked'].astype(int)
+
+XB_test['Sex'] = XB_test['Sex'].astype(int)
+XB_test['Embarked'] = XB_test['Embarked'].astype(int)
+
+
+yB_train['Survived'] = yB_train['Survived'].astype(int)
+yB_test['Survived'] = yB_test['Survived'].astype(int)
+
+param_XGB ={'booster': 'gbtree',
+ 'colsample_bytree': 0.7,
+ 'eta': 0.3,
+ 'max_depth': 6,
+ 'min_child_weight': 3,
+ 'n_estimators': 20,
+ 'objective': 'binary:logistic'}
+
+clf_Xgb = xgb.XGBClassifier(random_state=35,**param_XGB)
+
+clf_Xgb.fit(XB_train, yB_train.values.ravel()) 
+
+print('Accuracy XGB:',clf_Xgb.score(XB_test, yB_test)) 
+
+#save the model to file
+filename = 'models/xgb_model.sav' #use absolute path
 pickle.dump(modelo, open(filename, 'wb'))
