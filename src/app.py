@@ -124,3 +124,7 @@ print('Accuracy XGB:',clf_Xgb.score(XB_test, yB_test))
 #save the model to file
 filename = 'models/xgb_model.sav' #use absolute path
 pickle.dump(modelo, open(filename, 'wb'))
+
+#Flask Dump
+filename = 'models/titanic_model.pkl'
+pickle.dump(modelo, open(filename,'wb'))
